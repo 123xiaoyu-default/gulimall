@@ -1,20 +1,30 @@
+server:
+  port: 88
 spring:
   cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
     gateway:
       routes:
         - id: product_route
           uri: lb://gulimall-product
           predicates:
-          - Path=/api/product/**
+            - Path=/api/product/**
           filters:
-          - RewritePath=/api/(?<segment>.*), /$\{segment}
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
+
+        - id: third_party_route
+          uri: lb://gulimall-third-party
+          predicates:
+            - Path=/api/thirdparty/**
+          filters:
+            - RewritePath=/api/thirdparty/(?<segment>.*),/$\{segment}
 
         - id: admin_route
           uri: lb://renren-fast
           predicates:
-          - Path=/api/**
+            - Path=/api/**
           filters:
-          - RewritePath=/api/(?<segment>.*), /renren-fast/$\{segment}
-
-#前端项目，/api
-
+            # 过滤器实现路径重写功能：将 /api/** 重写为 /renren-fast/**
+            - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
